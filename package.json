@@ -1,10 +1,9 @@
 {
-  "name": "@borodutch/smart-contract-starter",
+  "name": "@borodutch/merv-contract",
   "version": "0.0.1",
-  "description": "A starter for Solidity smart contracts for Ethereum",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Borodutch/smart-contract-starter"
+    "url": "git+https://github.com/Borodutch/merv-contract"
   },
   "license": "MIT",
   "np": {
@@ -22,7 +21,10 @@
     "build": "yarn clean && npx hardhat compile",
     "clean": "npx hardhat clean",
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run --network deploy scripts/deploy.ts",
+    "deploy-mainnet": "npx hardhat run --network mainnet scripts/deploy.ts",
+    "deploy-testnet": "npx hardhat run --network testnet scripts/deploy.ts",
+    "upgrade-mainnet": "npx hardhat run --network mainnet scripts/upgrade.ts",
+    "upgrade-testnet": "npx hardhat run --network testnet scripts/upgrade.ts",
     "eth-lint": "yarn solhint 'contracts/**/*.sol'",
     "lint": "prettier --check . && eslint --max-warnings 0 scripts test && yarn eth-lint",
     "release": "np",
@@ -63,7 +65,6 @@
     "ethers": "^6.13.5",
     "globals": "^16.0.0",
     "hardhat": "^2.22.19",
-    "hardhat-gas-reporter": "^2.2.2",
     "np": "^10.2.0",
     "prettier": "^3.5.3",
     "prettier-plugin-solidity": "^1.4.2",
@@ -73,5 +74,9 @@
     "typechain": "^8.3.2",
     "typescript": "^5.8.2"
   },
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.7.0",
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^5.2.0",
+    "@openzeppelin/hardhat-upgrades": "^3.9.0"
+  }
 }

@@ -17,6 +17,14 @@
   "[solidity]": {
     "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
   },
-  "cSpell.words": ["nomicfoundation"],
+  "cSpell.words": [
+    "Initializable",
+    "Merv",
+    "Merved",
+    "merver",
+    "nomicfoundation",
+    "premint",
+    "Reentrancy"
+  ],
   "typescript.tsdk": "node_modules/typescript/lib"
 }
