@@ -43,6 +43,11 @@ contract Merv is
   event SupplyCapSet(uint256 newSupplyCap);
   event Merved(address indexed merver);
   event LookedIntoAbyss(address indexed looker);
+  event Redeemed(
+    address indexed redeemer,
+    uint256 mervAmount,
+    uint256 ethAmount
+  );
 
   function initialize(
     address initialOwner,
@@ -116,6 +121,32 @@ contract Merv is
     internal
     override(ERC20Upgradeable, ERC20PausableUpgradeable, ERC20VotesUpgradeable)
   {
+    // Check if tokens are being sent to this contract (redeem functionality)
+    if (to == address(this) && from != address(0)) {
+      // Validate mint rate is set
+      require(mintRate > 0, "Mint rate not set");
+
+      // Calculate ETH amount to send back
+      uint256 ethAmount = value / (mintRate * 2);
+      require(ethAmount > 0, "Redeem amount too small");
+      require(
+        address(this).balance >= ethAmount,
+        "Insufficient contract ETH balance"
+      );
+
+      // Burn the tokens directly from the sender instead of transferring to contract
+      super._update(from, address(0), value);
+
+      // Send ETH back to the original sender
+      payable(from).transfer(ethAmount);
+
+      // Emit redeem event
+      emit Redeemed(from, value, ethAmount);
+
+      return;
+    }
+
+    // Normal transfer behavior
     super._update(from, to, value);
   }
 
