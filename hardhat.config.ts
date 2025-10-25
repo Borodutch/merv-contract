@@ -46,6 +46,7 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: ETH_RPC_MAINNET,
       accounts: [CONTRACT_OWNER_PRIVATE_KEY],
+      chainId: 8453, // Base mainnet
     },
     local: {
       url: 'http://127.0.0.1:8545',
@@ -54,6 +55,19 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: 'base',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
+    ],
+  },
+  sourcify: {
+    enabled: false,
   },
   typechain: {
     outDir: 'typechain',

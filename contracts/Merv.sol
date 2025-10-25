@@ -95,12 +95,26 @@ contract Merv is
     payable(owner()).transfer(address(this).balance);
   }
 
-  function mint() public payable nonReentrant {
-    require(msg.value > 0, "No Ether sent");
-    uint256 amountToMint = msg.value * mintRate;
-    require(amountMinted + amountToMint <= supplyCap, "Supply cap exceeded");
-    amountMinted += amountToMint;
-    _mint(msg.sender, amountToMint);
+  function redeem(uint256 mervAmount) public nonReentrant {
+    require(mervAmount > 0, "No MERV tokens to redeem");
+    require(balanceOf(msg.sender) >= mervAmount, "Insufficient MERV balance");
+    require(mintRate > 0, "Mint rate not set");
+
+    uint256 ethAmount = mervAmount / (mintRate * 2);
+    require(ethAmount > 0, "Redeem amount too small");
+    require(
+      address(this).balance >= ethAmount,
+      "Insufficient contract ETH balance"
+    );
+
+    // Burn the MERV tokens first (this updates state)
+    _burn(msg.sender, mervAmount);
+
+    // Transfer ETH to the redeemer (external call last)
+    (bool success, ) = payable(msg.sender).call{value: ethAmount}("");
+    require(success, "ETH transfer failed");
+
+    emit Redeemed(msg.sender, mervAmount, ethAmount);
   }
 
   function merv() public {
@@ -121,32 +135,6 @@ contract Merv is
     internal
     override(ERC20Upgradeable, ERC20PausableUpgradeable, ERC20VotesUpgradeable)
   {
-    // Check if tokens are being sent to this contract (redeem functionality)
-    if (to == address(this) && from != address(0)) {
-      // Validate mint rate is set
-      require(mintRate > 0, "Mint rate not set");
-
-      // Calculate ETH amount to send back
-      uint256 ethAmount = value / (mintRate * 2);
-      require(ethAmount > 0, "Redeem amount too small");
-      require(
-        address(this).balance >= ethAmount,
-        "Insufficient contract ETH balance"
-      );
-
-      // Burn the tokens directly from the sender instead of transferring to contract
-      super._update(from, address(0), value);
-
-      // Send ETH back to the original sender
-      payable(from).transfer(ethAmount);
-
-      // Emit redeem event
-      emit Redeemed(from, value, ethAmount);
-
-      return;
-    }
-
-    // Normal transfer behavior
     super._update(from, to, value);
   }
 
