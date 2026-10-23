@@ -4,6 +4,9 @@ on:
     types: [synchronize, opened]
 env:
   NODE_ENV: test
+  # Compiling only: hardhat.config.ts requires these, nothing connects to them
+  ETH_RPC: https://example.com/rpc
+  ETH_RPC_MAINNET: https://example.com/rpc
 jobs:
   build-and-lint-code:
     runs-on: ubuntu-latest
